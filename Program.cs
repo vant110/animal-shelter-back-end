@@ -27,8 +27,8 @@ app.MapGet("/api/animals/{species?}", async (string ? species, animalshelterCont
         "younger" => await db.Animals
             .Where(a => (speciesId == null || a.SpeciesId == speciesId)
                 & (!context.Request.Query.ContainsKey("vaccination") || a.VaccinationStatus)
-                & (!context.Request.Query.ContainsKey("chip") || a.SterilizationStatus)
-                & (!context.Request.Query.ContainsKey("sterilization") || a.ChipStatus))
+                & (!context.Request.Query.ContainsKey("sterilization") || a.SterilizationStatus)
+                & (!context.Request.Query.ContainsKey("chip") || a.ChipStatus))
             .OrderByDescending(a => a.BirthYear)
             .Select(a => new
             {
@@ -40,8 +40,8 @@ app.MapGet("/api/animals/{species?}", async (string ? species, animalshelterCont
         "older" => await db.Animals
             .Where(a => (speciesId == null || a.SpeciesId == speciesId)
                 & (!context.Request.Query.ContainsKey("vaccination") || a.VaccinationStatus)
-                & (!context.Request.Query.ContainsKey("chip") || a.SterilizationStatus)
-                & (!context.Request.Query.ContainsKey("sterilization") || a.ChipStatus))
+                & (!context.Request.Query.ContainsKey("sterilization") || a.SterilizationStatus)
+                & (!context.Request.Query.ContainsKey("chip") || a.ChipStatus))
             .OrderBy(a => a.BirthYear)
             .Select(a => new
             {
@@ -53,8 +53,8 @@ app.MapGet("/api/animals/{species?}", async (string ? species, animalshelterCont
         "earlier" => await db.Animals
             .Where(a => (speciesId == null || a.SpeciesId == speciesId)
                 & (!context.Request.Query.ContainsKey("vaccination") || a.VaccinationStatus)
-                & (!context.Request.Query.ContainsKey("chip") || a.SterilizationStatus)
-                & (!context.Request.Query.ContainsKey("sterilization") || a.ChipStatus))
+                & (!context.Request.Query.ContainsKey("sterilization") || a.SterilizationStatus)
+                & (!context.Request.Query.ContainsKey("chip") || a.ChipStatus))
             .OrderBy(a => a.ArrivalDate)
             .Select(a => new
             {
@@ -66,8 +66,8 @@ app.MapGet("/api/animals/{species?}", async (string ? species, animalshelterCont
         _ => await db.Animals
             .Where(a => (speciesId == null || a.SpeciesId == speciesId)
                 & (!context.Request.Query.ContainsKey("vaccination") || a.VaccinationStatus)
-                & (!context.Request.Query.ContainsKey("chip") || a.SterilizationStatus)
-                & (!context.Request.Query.ContainsKey("sterilization") || a.ChipStatus))
+                & (!context.Request.Query.ContainsKey("sterilization") || a.SterilizationStatus)
+                & (!context.Request.Query.ContainsKey("chip") || a.ChipStatus))
             .OrderByDescending(a => a.ArrivalDate)
             .Select(a => new
             {
