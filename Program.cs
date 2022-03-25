@@ -22,61 +22,39 @@ app.MapGet("/api/animals/{species?}", async (string ? species, animalshelterCont
         _ => 255,
     };
     if (speciesId == 255) return Results.BadRequest();
-    return Results.Json((string)context.Request.Query["sorting"] switch
+
+    IQueryable<Animal> animals = db.Animals;
+    if (speciesId != null)
     {
-        "younger" => await db.Animals
-            .Where(a => (speciesId == null || a.SpeciesId == speciesId)
-                & (!context.Request.Query.ContainsKey("vaccination") || a.VaccinationStatus)
-                & (!context.Request.Query.ContainsKey("sterilization") || a.SterilizationStatus)
-                & (!context.Request.Query.ContainsKey("chip") || a.ChipStatus))
-            .OrderByDescending(a => a.BirthYear)
-            .Select(a => new
-            {
-                a.AnimalId,
-                a.Name,
-                a.ImageName
-            })
-            .ToListAsync(),
-        "older" => await db.Animals
-            .Where(a => (speciesId == null || a.SpeciesId == speciesId)
-                & (!context.Request.Query.ContainsKey("vaccination") || a.VaccinationStatus)
-                & (!context.Request.Query.ContainsKey("sterilization") || a.SterilizationStatus)
-                & (!context.Request.Query.ContainsKey("chip") || a.ChipStatus))
-            .OrderBy(a => a.BirthYear)
-            .Select(a => new
-            {
-                a.AnimalId,
-                a.Name,
-                a.ImageName
-            })
-            .ToListAsync(),
-        "earlier" => await db.Animals
-            .Where(a => (speciesId == null || a.SpeciesId == speciesId)
-                & (!context.Request.Query.ContainsKey("vaccination") || a.VaccinationStatus)
-                & (!context.Request.Query.ContainsKey("sterilization") || a.SterilizationStatus)
-                & (!context.Request.Query.ContainsKey("chip") || a.ChipStatus))
-            .OrderBy(a => a.ArrivalDate)
-            .Select(a => new
-            {
-                a.AnimalId,
-                a.Name,
-                a.ImageName
-            })
-            .ToListAsync(),
-        _ => await db.Animals
-            .Where(a => (speciesId == null || a.SpeciesId == speciesId)
-                & (!context.Request.Query.ContainsKey("vaccination") || a.VaccinationStatus)
-                & (!context.Request.Query.ContainsKey("sterilization") || a.SterilizationStatus)
-                & (!context.Request.Query.ContainsKey("chip") || a.ChipStatus))
-            .OrderByDescending(a => a.ArrivalDate)
-            .Select(a => new
-            {
-                a.AnimalId,
-                a.Name,
-                a.ImageName
-            })
-            .ToListAsync(),
-    });
+        animals = animals.Where(a => a.SpeciesId == speciesId);
+    }
+    if (context.Request.Query.ContainsKey("vaccination"))
+    {
+        animals = animals.Where(a => a.VaccinationStatus == true);
+    }
+    if (context.Request.Query.ContainsKey("sterilization"))
+    {
+        animals = animals.Where(a => a.SterilizationStatus == true);
+    }
+    if (context.Request.Query.ContainsKey("chip"))
+    {
+        animals = animals.Where(a => a.ChipStatus == true);
+    }
+    animals = (string)context.Request.Query["sorting"] switch
+    {
+        "younger" => animals.OrderByDescending(a => a.BirthYear),
+        "older" => animals.OrderBy(a => a.BirthYear),
+        "earlier" => animals.OrderBy(a => a.ArrivalDate),
+        _ => animals.OrderByDescending(a => a.ArrivalDate),
+    };
+    return Results.Json(await animals
+        .Select(a => new
+        {
+            a.AnimalId,
+            a.Name,
+            a.ImageName
+        })
+        .ToListAsync());
 });
 
 app.MapGet("/api/articles", async (animalshelterContext db, HttpContext context) =>
@@ -84,6 +62,7 @@ app.MapGet("/api/articles", async (animalshelterContext db, HttpContext context)
     const int n = 10;
     if (!int.TryParse(context.Request.Query["page"], out var page)) return Results.BadRequest();
     if (page < 1) return Results.BadRequest();
+
     return Results.Json(await db.Articles
         .OrderByDescending(a => a.ArticleId)
         .Select(a => new
@@ -94,8 +73,7 @@ app.MapGet("/api/articles", async (animalshelterContext db, HttpContext context)
         })
         .Skip((page - 1) * n)
         .Take(n)
-        .ToListAsync()
-    );
+        .ToListAsync());
 });
 
 app.MapPost("/api/animals", async (IWebHostEnvironment environment, animalshelterContext db, HttpContext context) =>
