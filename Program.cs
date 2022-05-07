@@ -11,7 +11,10 @@ var app = builder.Build();
 
 app.UseFileServer();
 
-app.MapGet("/api/animals/{species?}", async (string ? species, animalshelterContext db, HttpContext context) =>
+app.MapGet("/api/animals/{species?}", async (
+    string? species,
+    animalshelterContext db,
+    HttpContext context) =>
 {
     byte? speciesId = species switch
     {
@@ -57,7 +60,9 @@ app.MapGet("/api/animals/{species?}", async (string ? species, animalshelterCont
         .ToListAsync());
 });
 
-app.MapGet("/api/articles", async (animalshelterContext db, HttpContext context) =>
+app.MapGet("/api/articles", async (
+    animalshelterContext db, 
+    HttpContext context) =>
 {
     const int n = 10;
     if (!int.TryParse(context.Request.Query["page"], out var page)) return Results.BadRequest();
@@ -76,7 +81,10 @@ app.MapGet("/api/articles", async (animalshelterContext db, HttpContext context)
         .ToListAsync());
 });
 
-app.MapPost("/api/animals", async (IWebHostEnvironment environment, animalshelterContext db, HttpContext context) =>
+app.MapPost("/api/animals", async (
+    IWebHostEnvironment environment, 
+    animalshelterContext db, 
+    HttpContext context) =>
 {
     var form = context.Request.Form;
 
